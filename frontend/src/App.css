@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@keyframes gradientMovement {
+  0% {
+    background-position: 200% 0;
+  }
+  50% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Animación para el logo (ya aplicada) */
+.animate-gradientText {
+  background: linear-gradient(45deg, #ff6ec7, #686de0, #5f27cd, #ff9f43);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradientMovement 5s ease infinite;
+}
+
+/* Estilo de gradiente para los enlaces en el hover */
+.navLink-hover {
+  display: inline-block;
+  background: linear-gradient(45deg, #ff6ec7, #686de0, #5f27cd, #ff9f43);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  color: transparent;
+  transition: all 0.3s ease-in-out;
+}
+
+.navLink-hover:hover {
+  animation: gradientMovement 5s ease infinite;
+}
