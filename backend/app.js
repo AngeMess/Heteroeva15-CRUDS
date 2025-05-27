@@ -1,5 +1,6 @@
 // Importo todo lo de la libreria de Express
 import express from "express";
+import cors from "cors";
 import productsRoutes from "./src/routes/products.js";
 import customersRoutes from "./src/routes/customers.js";
 import employeeRoutes from "./src/routes/employees.js";
@@ -15,6 +16,13 @@ import blogRoutes from "./src/routes/blog.js";
 
 // Creo una constante que es igual a la libreria que importé
 const app = express();
+
+app.use(cors({
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
 
 // Que acepte datos en json
 app.use(express.json());

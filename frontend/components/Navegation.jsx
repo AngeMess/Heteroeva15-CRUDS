@@ -10,7 +10,6 @@ import {
   Route,
   useNavigate,
 } from "react-router-dom";
-import { PrivateRoute } from "./PrivateRoute";
 
 function Navegation() {
 
@@ -19,7 +18,7 @@ function Navegation() {
       <NavBar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route element={<PrivateRoute />}>
+        <Route>
           <Route path="/home" element={<Home />} />
           <Route path="/employees" element={<Employees />} />
           <Route path="/blog" element={<Blog />} />
