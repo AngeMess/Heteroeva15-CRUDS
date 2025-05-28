@@ -1,126 +1,130 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from 'react'
 
-const useDataBrands = () => {
+const useDataEmployee = () => {
+  const [employees, setEmployees] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const [activeTab, setActiveTab] = useState("list");
-  const API = "http://localhost:4000/api/brands";
-  const [id, setId] = useState("");
-  const [nameBrand, setNameBrand] = useState("");
-  const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const fetchEmployees = async () => {
+    try {
 
-  const fetchBrands = async () => {
-    const response = await fetch(API);
-    if (!response.ok) {
-      throw new Error("Hubo un error al obtener las marcas");
+      setLoading(true)
+      setError(null)
+
+      const response = await fetch('http://localhost:4000/api/employee')
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`)
+      }
+      const data = await response.json()
+      setEmployees(data)
+
+    } catch (err) {
+      setError(err.message)
+      console.error('Error fetching employees:', err)
+    } finally {
+      setLoading(false)
     }
-    const data = await response.json();
-    setBrands(data);
-    setLoading(false);
-  
-  };
+  }
 
-  useEffect(() => {
-    fetchBrands();
-  }, []);
+  const refreshEmployees = async () => {
+    await fetchEmployees()
+  }
 
-  const saveBrand = async (e) => {
-    e.preventDefault();
-
-    const newBrand = {
-      name: nameBrand,
-    };
-
-    const response = await fetch(API, {
-      method: "POST",
-      headers: {
-      "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(newBrand),
-    });
-
-    if (!response.ok) {
-      throw new Error("Hubo un error al registrar el empleado");
-    }
-
-    const data = await response.json();
-    toast.success('Nueva marca registrada exitosamente');
-    setBrands(data);
-    fetchBrands();
-    setNameBrand("");
-  };
-
-  const deleteBrand = async (id) => {
-    const response = await fetch(`${API}/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Hubo un error al eliminar la marca");
-    }
-
-    toast.success('Marca eliminada exitosamente');
-    fetchBrands();
-  };
-
-  const updateBrands = async (dataBrand) => {
-    setId(dataBrand._id);
-    setNameBrand(dataBrand.name);
-    setActiveTab("form");
-  };
-
-  const handleEdit = async (e) => {
-    e.preventDefault();
+  const addEmployee = async (employeeData) => {
 
     try {
-      const editBrand = {
-        name: nameBrand,
-      };
-      const response = await fetch(`${API}/${id}`, {
-        method: "PUT",
+      setError(null)
+      const response = await fetch('hhttp://localhost:4000/api/employee', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(editBrand),
-      });
+        body: JSON.stringify(employeeData),
+      })
 
       if (!response.ok) {
-        throw new Error("Error al actualizar la marca");
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
       }
 
-      const data = await response.json();
-      toast.success('Marca Actualizada');
-      setBrands(data);
-      setId(""); // Limpiar el ID
-      //setActiveTab("list");
-      fetchBrands(); // Volver a cargar la lista
-    } catch (error) {
-      console.error("Error al editar la marca:", error);
-      alert("Error al editar la marca");
+      const newEmployee = await response.json()
+      setEmployees(prev => [...prev, newEmployee])
+      return newEmployee
+    } catch (err) {
+      setError(err.message)
+      console.error('Error adding employee:', err)
+      throw err
     }
-  };
 
-return {
-        activeTab, 
-        setActiveTab,
-        id,
-        setId,
-        nameBrand,
-        setNameBrand,
-        brands,
-        setBrands,
-        loading,
-        setLoading,
-        fetchBrands,
-        saveBrand,
-        deleteBrand,
-        updateBrands,
-        handleEdit,
+  }
+
+  const updateEmployee = async (id, employeeData) => {
+    try {
+      setError(null)
+      const response = await fetch(`http://localhost:4000/api/employee/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(employeeData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
+      }
+
+      const updatedEmployee = await response.json()
+      setEmployees(prev => prev.map(employee =>
+        employee._id === id ? updatedEmployee : employee
+      ))
+
+      return updatedEmployee
+    } catch (err) {
+      setError(err.message)
+      console.error('Error updating employee:', err)
+      throw err
     }
+  }
+
+  const deleteEmployee = async (id) => {
+    try {
+      setError(null)
+      const response = await fetch(`http://localhost:4000/api/employee/${id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
+      }
+      setEmployees(prev => prev.filter(employee => employee._id !== id))
+
+    } catch (err) {
+      setError(err.message)
+      console.error('Error deleting employee:', err)
+      throw err
+    }
+
+  }
+
+  useEffect(() => {
+    fetchEmployees()
+  }, [])
+
+  return {
+    employees,
+    loading,
+    error,
+    fetchEmployees,
+    refreshEmployees,
+    addEmployee,
+    updateEmployee,
+    deleteEmployee,
+  }
+
 }
 
-export default useDataBrands;
+ 
+
+export default useDataEmployee

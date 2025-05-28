@@ -1,56 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { User, Pencil, Trash } from 'lucide-react'
 import DatePicker from 'react-datepicker'
-import axios from 'axios';
+import useDataEmployee from './UseDataEmployees'
 import 'react-datepicker/dist/react-datepicker.css'
 
-const initialEmployeesData = [
-    {
-        id: 1,
-        nombre: 'Juan',
-        apellido: 'Pérez',
-        fechaNacimiento: new Date(1990, 5, 15),
-        email: 'juan@example.com',
-        direccion: 'Calle Falsa 123',
-        password: 'secret123',
-        telefono: '555-1234',
-        dui: '12345678-9',
-        fechaContratacion: new Date(2020, 0, 1),
-    },
-    {
-        id: 2,
-        nombre: 'María',
-        apellido: 'González',
-        fechaNacimiento: new Date(1985, 10, 20),
-        email: 'maria@example.com',
-        direccion: 'Avenida Siempre Viva 742',
-        password: 'password456',
-        telefono: '555-5678',
-        dui: '98765432-1',
-        fechaContratacion: new Date(2019, 3, 15),
-    },
-    {
-        id: 3,
-        nombre: 'Carlos',
-        apellido: 'Ramírez',
-        fechaNacimiento: new Date(1992, 7, 7),
-        email: 'carlos@example.com',
-        direccion: 'Boulevard Central 45',
-        password: 'mypassword789',
-        telefono: '555-9012',
-        dui: '45612378-0',
-        fechaContratacion: new Date(2021, 6, 10),
-    },
-]
-
 export default function EmployeeTable() {
-    const [employees, setEmployees] = useState(initialEmployeesData)
-
+    const {employees, loading, error, deleteEmployee, refreshEmployees } = useDataEmployee()
+    //const [employees, setEmployees] = useState(initialEmployeesData)
     const [searchTerm, setSearchTerm] = useState('')
     const [modalOpen, setModalOpen] = useState(false) // Crear modal
-    const [selectedEmployee, setSelectedEmployee] = useState(null) // Modal detalle
-    const [editEmployee, setEditEmployee] = useState(null) // Modal editar
-    const [deleteEmployee, setDeleteEmployee] = useState(null)
+    //const [selectedEmployee, setSelectedEmployee] = useState(null) // Modal detalle
+    //const [editEmployee, setEditEmployee] = useState(null) // Modal editar
+    //const [deleteEmployee, setDeleteEmployee] = useState(null)
 
     // Form creación
     const [form, setForm] = useState({
@@ -96,10 +57,11 @@ export default function EmployeeTable() {
         }
     }, [editEmployee])
 
-    const filteredEmployees = employees.filter((emp) =>
-        `${emp.nombre} ${emp.apellido} ${emp.dui} ${emp.email}`
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+    const filteredEmployees = employees.filter(employee =>
+        employee.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        employee.dui?.includes(searchTerm)
     )
 
     const handleInputChange = (e) => {
