@@ -1,45 +1,43 @@
 import { useState, useEffect } from 'react'
 
-const useDataEmployee = () => {
-  const [employees, setEmployees] = useState([])
+const useDataBlog = () => {
+  const [blogs, setBlogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchEmployees = async () => {
+  const fetchBlogs = async () => {
     try {
-
       setLoading(true)
       setError(null)
 
-      const response = await fetch('http://localhost:4000/api/employee')
+      const response = await fetch('http://localhost:4000/api/blog')
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`)
       }
       const data = await response.json()
-      setEmployees(data)
+      setBlogs(data)
 
     } catch (err) {
       setError(err.message)
-      console.error('Error fetching employees:', err)
+      console.error('Error fetching blogs:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  const refreshEmployees = async () => {
-    await fetchEmployees()
+  const refreshBlogs = async () => {
+    await fetchBlogs()
   }
 
-  const addEmployee = async (employeeData) => {
-
+  const addBlog = async (blogData) => {
     try {
       setError(null)
-      const response = await fetch('http://localhost:4000/api/employee', {
+      const response = await fetch('http://localhost:4000/api/blog', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(employeeData),
+        body: JSON.stringify(blogData),
       })
 
       if (!response.ok) {
@@ -47,26 +45,25 @@ const useDataEmployee = () => {
         throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
       }
 
-      const newEmployee = await response.json()
-      setEmployees(prev => [...prev, newEmployee])
-      return newEmployee
+      const newBlog = await response.json()
+      setBlogs(prev => [...prev, newBlog])
+      return newBlog
     } catch (err) {
       setError(err.message)
-      console.error('Error adding employee:', err)
+      console.error('Error adding blog:', err)
       throw err
     }
-
   }
 
-  const updateEmployee = async (id, employeeData) => {
+  const updateBlog = async (id, blogData) => {
     try {
       setError(null)
-      const response = await fetch(`http://localhost:4000/api/employee/${id}`, {
+      const response = await fetch(`http://localhost:4000/api/blog/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(employeeData),
+        body: JSON.stringify(blogData),
       })
 
       if (!response.ok) {
@@ -74,23 +71,20 @@ const useDataEmployee = () => {
         throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
       }
 
-      const updatedEmployee = await response.json()
-      setEmployees(prev => prev.map(employee =>
-        employee._id === id ? updatedEmployee : employee
-      ))
-
-      return updatedEmployee
+      const updatedBlog = await response.json()
+      setBlogs(prev => prev.map(blog => blog._id === id ? updatedBlog : blog))
+      return updatedBlog
     } catch (err) {
       setError(err.message)
-      console.error('Error updating employee:', err)
+      console.error('Error updating blog:', err)
       throw err
     }
   }
 
-  const deleteEmployee = async (id) => {
+  const deleteBlog = async (id) => {
     try {
       setError(null)
-      const response = await fetch(`http://localhost:4000/api/employee/${id}`, {
+      const response = await fetch(`http://localhost:4000/api/blog/${id}`, {
         method: 'DELETE',
       })
 
@@ -98,33 +92,20 @@ const useDataEmployee = () => {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
       }
-      setEmployees(prev => prev.filter(employee => employee._id !== id))
 
+      setBlogs(prev => prev.filter(blog => blog._id !== id))
     } catch (err) {
       setError(err.message)
-      console.error('Error deleting employee:', err)
+      console.error('Error deleting blog:', err)
       throw err
     }
-
   }
 
   useEffect(() => {
-    fetchEmployees()
+    fetchBlogs()
   }, [])
 
-  return {
-    employees,
-    loading,
-    error,
-    fetchEmployees,
-    refreshEmployees,
-    addEmployee,
-    updateEmployee,
-    deleteEmployee,
-  }
-
+  return { blogs, loading, error, addBlog, updateBlog, deleteBlog, refreshBlogs }
 }
 
- 
-
-export default useDataEmployee
+export default useDataBlog

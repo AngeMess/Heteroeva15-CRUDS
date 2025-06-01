@@ -1,45 +1,43 @@
 import { useState, useEffect } from 'react'
 
-const useDataEmployee = () => {
-  const [employees, setEmployees] = useState([])
+const useDataProduct = () => {
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchEmployees = async () => {
+  const fetchProducts = async () => {
     try {
-
       setLoading(true)
       setError(null)
 
-      const response = await fetch('http://localhost:4000/api/employee')
+      const response = await fetch('http://localhost:4000/api/products')
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`)
       }
       const data = await response.json()
-      setEmployees(data)
+      setProducts(data)
 
     } catch (err) {
       setError(err.message)
-      console.error('Error fetching employees:', err)
+      console.error('Error fetching products:', err)
     } finally {
       setLoading(false)
     }
   }
 
-  const refreshEmployees = async () => {
-    await fetchEmployees()
+  const refreshProducts = async () => {
+    await fetchProducts()
   }
 
-  const addEmployee = async (employeeData) => {
-
+  const addProduct = async (productData) => {
     try {
       setError(null)
-      const response = await fetch('http://localhost:4000/api/employee', {
+      const response = await fetch('http://localhost:4000/api/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(employeeData),
+        body: JSON.stringify(productData),
       })
 
       if (!response.ok) {
@@ -47,26 +45,25 @@ const useDataEmployee = () => {
         throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
       }
 
-      const newEmployee = await response.json()
-      setEmployees(prev => [...prev, newEmployee])
-      return newEmployee
+      const newProduct = await response.json()
+      setProducts(prev => [...prev, newProduct])
+      return newProduct
     } catch (err) {
       setError(err.message)
-      console.error('Error adding employee:', err)
+      console.error('Error adding product:', err)
       throw err
     }
-
   }
 
-  const updateEmployee = async (id, employeeData) => {
+  const updateProduct = async (id, productData) => {
     try {
       setError(null)
-      const response = await fetch(`http://localhost:4000/api/employee/${id}`, {
+      const response = await fetch(`http://localhost:4000/api/products/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(employeeData),
+        body: JSON.stringify(productData),
       })
 
       if (!response.ok) {
@@ -74,23 +71,20 @@ const useDataEmployee = () => {
         throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
       }
 
-      const updatedEmployee = await response.json()
-      setEmployees(prev => prev.map(employee =>
-        employee._id === id ? updatedEmployee : employee
-      ))
-
-      return updatedEmployee
+      const updatedProduct = await response.json()
+      setProducts(prev => prev.map(product => product._id === id ? updatedProduct : product))
+      return updatedProduct
     } catch (err) {
       setError(err.message)
-      console.error('Error updating employee:', err)
+      console.error('Error updating product:', err)
       throw err
     }
   }
 
-  const deleteEmployee = async (id) => {
+  const deleteProduct = async (id) => {
     try {
       setError(null)
-      const response = await fetch(`http://localhost:4000/api/employee/${id}`, {
+      const response = await fetch(`http://localhost:4000/api/products/${id}`, {
         method: 'DELETE',
       })
 
@@ -98,33 +92,20 @@ const useDataEmployee = () => {
         const errorData = await response.json().catch(() => ({}))
         throw new Error(errorData.message || `Error: ${response.status} ${response.statusText}`)
       }
-      setEmployees(prev => prev.filter(employee => employee._id !== id))
 
+      setProducts(prev => prev.filter(product => product._id !== id))
     } catch (err) {
       setError(err.message)
-      console.error('Error deleting employee:', err)
+      console.error('Error deleting product:', err)
       throw err
     }
-
   }
 
   useEffect(() => {
-    fetchEmployees()
+    fetchProducts()
   }, [])
 
-  return {
-    employees,
-    loading,
-    error,
-    fetchEmployees,
-    refreshEmployees,
-    addEmployee,
-    updateEmployee,
-    deleteEmployee,
-  }
-
+  return { products, loading, error, addProduct, updateProduct, deleteProduct, refreshProducts }
 }
 
- 
-
-export default useDataEmployee
+export default useDataProduct
